@@ -8,7 +8,7 @@ namespace Hospital_Management_System.Services.IServices
         Task<ResponseDTO> AddNewPatientRecord(PatientDTO patientDto);
         Task<Patient> GetPatient(Guid id);
         Task<List<Appointment>> ViewPatientAppointments(Patient patientId);
-        Task<ResponseDTO> UpdatePatientDetails(PatientDTO newDetails, Guid id);
+        Task<Patient> UpdatePatientDetails(PatientDTO newDetails, Guid id);
 
     }
 }

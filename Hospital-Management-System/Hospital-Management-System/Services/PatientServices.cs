@@ -28,8 +28,8 @@ namespace Hospital_Management_System.Services
                 var mappedPatient = _mapper.Map<Patient>(patientDto);
                 await _dbContext.Patients.AddAsync(mappedPatient);
                 await _dbContext.SaveChangesAsync();
-                _response.Result = patientDto;
-                _response.Message = $"Patient's {patientDto.Name} Record has been created";
+                _response.Result = mappedPatient;
+                _response.Message = $"Patient's {mappedPatient.Name} Record has been created";
                 _response.IsSuccess = true;
                 return _response;
 
@@ -67,35 +67,35 @@ namespace Hospital_Management_System.Services
             
         }
 
-        public async Task<ResponseDTO> UpdatePatientDetails(PatientDTO newDetails, Guid id) 
+        public async Task<Patient> UpdatePatientDetails(PatientDTO newDetails, Guid id) 
         {
             try
             {
-                var patientRecord = _dbContext.Patients.Find(id);
-                if (patientRecord != null)
+                var foundPatient = await GetPatient(id);
+
+                if (foundPatient != null)
                 {
-                    patientRecord.Name = newDetails.Name;
-                    patientRecord.Gender = newDetails.Gender;
-                    patientRecord.Phone = newDetails.Phone;
 
+                    foundPatient.Name = newDetails.Name;
+                    foundPatient.Gender = newDetails.Gender;
+                    foundPatient.Phone = newDetails.Phone;
                     await _dbContext.SaveChangesAsync();
-
-                    _response.Message = $"{patientRecord.Name}'s Details have been updated";
-                    _response.IsSuccess = true;
-                    _response.Result = patientRecord;
-                    return _response;
+                    return foundPatient;
                 }
-                _response.Message = "Something went wrong ";
-                _response.IsSuccess = false;
-                return _response;
+                throw new NotFoundException("Patient not found");
+
+            }
+            catch (NotFoundException ex)
+            {
+                throw;
 
             }
             catch (Exception ex)
             {
-
-                _response.Message = ex.Message;
-                _response.IsSuccess = false;
-                return _response;
+                throw new Exception("", ex);
+                //_response.Message = ex.Message;
+                //_response.IsSuccess = false;
+                //return _response;
             }
         }
 

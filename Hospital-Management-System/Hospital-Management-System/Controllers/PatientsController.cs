@@ -1,4 +1,5 @@
-﻿using Hospital_Management_System.Exceptions;
+﻿using AutoMapper;
+using Hospital_Management_System.Exceptions;
 using Hospital_Management_System.Models;
 using Hospital_Management_System.Models.DTOs;
 using Hospital_Management_System.Services.IServices;
@@ -13,10 +14,12 @@ namespace Hospital_Management_System.Controllers
     {
         private readonly IPatient _patient;
         private readonly ResponseDTO _response;
+        private readonly IMapper _mapper;
 
-        public PatientsController(IPatient patient)
+        public PatientsController(IPatient patient, IMapper mapper)
         {
             _patient = patient;
+            _mapper = mapper;
             _response = new ResponseDTO();
         }
         [HttpPost]
@@ -31,12 +34,33 @@ namespace Hospital_Management_System.Controllers
             return BadRequest();
 
         }
-        [HttpGet]
+        [HttpGet("GetSinglePatient/{id:guid}")]
         public async Task<ActionResult<Patient>> GetPatient(Guid id)
         {
             try
             {
                 return await _patient.GetPatient(id);
+            }
+            catch (NotFoundException ex)
+            {
+
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("UpdatePatientDetails/{id:guid}")]
+        public async Task<ActionResult<Patient>> UpdatePatientDetails(PatientDTO patientDTO, Guid id)
+        {
+            try
+            {
+                
+                var result = await _patient.UpdatePatientDetails(patientDTO, id);
+                return Ok(result);
+
             }
             catch (NotFoundException ex)
             {
