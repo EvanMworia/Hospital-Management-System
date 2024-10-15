@@ -1,6 +1,8 @@
 using Hospital_Management_System.Data;
 using Hospital_Management_System.Services;
 using Hospital_Management_System.Services.IServices;
+using Hospital_Management_System.Services;
+using Hospital_Management_System.Services.Iservice;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,10 +22,19 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IPatient, PatientServices>();
 
 
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("myconnection"));
+});
+
+builder.Services.AddScoped<IDoctor, DoctorService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
